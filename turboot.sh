@@ -12,6 +12,7 @@ IS_CONFIG_PRESENT=0
 CWD=$(pwd)
 ADDITIONAL_MODS=()
 FORCE=0
+TEMPGEN=""
 
 # Setting term colors
 bold=$(tput bold)
@@ -85,16 +86,8 @@ detect_config() {
     fi
 }
 
-read_config() {
-    if [ -f $CONF_FILE ]; then
-        . /etc/os-release
-    else
-        e_error "Cannot find the conf file"
-    fi
-}
-
 write_config() {
-    printf "OS=%s\nPACKAGE_MANAGER=%s\nCREATED_AT=%s" "$OS" "$PACKAGE_MANAGER" "$DATE" >>$CONF_FILE
+    printf "OS=%s\nPACKAGE_MANAGER=%s\nCREATED_AT=%s" "$OS" "$PACKAGE_MANAGER" "$DATE" >$CONF_FILE
 }
 
 find_package_manager() {
@@ -168,9 +161,16 @@ get_setup() {
 source_installation_file() {
     source "$PACKAGE_MANAGER".sh 2>/dev/null
     if [ $? -eq 1 ]; then
-        e_error "Cannot find installation files for $PACKAGE_MANAGER, generate one using \$(./turboot -g $PACKAGE_MANAGER)"
+        e_error "Cannot find installation files for $PACKAGE_MANAGER, generate one using -> ./turboot -g $PACKAGE_MANAGER"
         exit 1
     fi
+}
+
+package_manager_template_generator() {
+    printf "# Package Manager template for $@\n\n" >>"$@.sh"
+    for mods in "${MODS[@]}"; do
+        printf "install_$mods() {\n    #Add your command to install $mods here\n    echo TODO:"$mods"\n}\n" >>"$@.sh"
+    done
 }
 
 echo " _              _                 _
@@ -181,11 +181,22 @@ echo " _              _                 _
 
 e_header "Highly extensible and configurable dotfiles setup manager"
 e_shameless_plug "Authored by: Hemanth Krishna (https://github.com/DarthBenro008)"
-while getopts f flag; do
+while getopts g:f flag; do
     case "${flag}" in
     f) FORCE=1 ;;
+    g) TEMPGEN=${OPTARG} ;;
     esac
 done
+if [[ $TEMPGEN != "" ]]; then
+    e_warning "Generating package manager template for $TEMPGEN"
+    package_manager_template_generator $TEMPGEN
+    e_success "Generated template for $TEMPGEN at $TEMPGEN.sh"
+    detect_config
+    PACKAGE_MANAGER=$TEMPGEN
+    write_config
+    e_arrow "$TEMPGEN has been set as package manager, run ./turboot"
+    exit 0
+fi
 detect_config
 if [ $IS_CONFIG_PRESENT -eq 1 ] && [ $FORCE -eq 0 ]; then
     . $CONF_FILE
