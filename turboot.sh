@@ -27,6 +27,9 @@ blue=$(tput setaf 38)
 e_header() {
     printf "\n${bold}${tan}==========  %s  ==========${reset}\n\n" "$@"
 }
+e_shameless_plug() {
+    printf "➜ $@\n${reset}"
+}
 e_arrow() {
     printf "  ➜ $@\n"
 }
@@ -169,15 +172,22 @@ echo " _              _                 _
  \__|\__,_|_|  |_.__/ \___/ \___/ \__|"
 
 e_header "Highly extensible and configurable dotfiles setup manager"
-e_underline "Developed by: Hemanth Krishna (https://github.com/DarthBenro008)"
+e_shameless_plug "Authored by: Hemanth Krishna (https://github.com/DarthBenro008)"
+while getopts f flag; do
+    case "${flag}" in
+    f) FORCE=1 ;;
+    esac
+done
 detect_config
-if [ $IS_CONFIG_PRESENT -eq 1 ]; then
+if [ $IS_CONFIG_PRESENT -eq 1 ] && [ $FORCE -eq 0 ]; then
     . $CONF_FILE
     e_warning "Turboot config found which was created on: $CREATED_AT"
+    printf "\n"
     print_config_for_confirmation
 else
     find_os
     find_package_manager $OS
+    printf "\n"
     print_config_for_confirmation
     prompt_user "Are these configs correct?"
     if [ $? -eq 1 ]; then
