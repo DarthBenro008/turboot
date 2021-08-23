@@ -1,1 +1,0 @@
-# Package Manager Template

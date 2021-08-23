@@ -1,10 +1,19 @@
 #!/bin/bash
 
 # Setting User Global configs
-MODS=("zsh" "tmux" "oh_my_zsh" "node" "yarn" "nvim" "vim_plug" "python") # Global Mod, add your mod here
-DEFAULT_MODS=("zsh" "tmux" "oh_my_zsh" "node" "yarn" "nvim" "vim_plug")  # Set of default mods, subset of MODS
-CONF_FILE="$HOME/.turbootrc"                                             # Location to find your config file
-PACKAGE_MANAGER="apt"                                                    # Default Fallback Package Manager
+MODS=("zsh" "tmux" "oh_my_zsh" "node" "yarn" "nvim" "vim_plug" "python" "fzf") # Global Mod, add your mod here
+DEFAULT_MODS=("zsh" "tmux" "oh_my_zsh" "node" "yarn" "nvim" "vim_plug")        # Set of default mods, subset of MODS
+CONF_FILE="$HOME/.turbootrc"                                                   # Location to find your config file
+PACKAGE_MANAGER="apt"                                                          # Default Fallback Package Manager
+
+create_symlinks() {
+    # Creating Symlinks
+    ln -sf $CWD/.alacritty.yml ~/.alacritty.yml
+    ln -sf $CWD/nvim ~/.config/nvim
+    ln -sf $CWD/.zshrc ~/.zshrc
+    ln -sf $CWD/.p10k.zsh ~/.p10k
+    e_success "Created symlinks to configs"
+}
 
 # Setting Turboot configs
 DATE=$(date --iso-8601=seconds)
@@ -138,15 +147,6 @@ print_config_for_confirmation() {
     e_heading "The following modules are set for default installation"
     print_array "${DEFAULT_MODS[@]}"
 
-}
-
-create_symlinks() {
-    # Creating Symlinks
-    ln -sf $CWD/.alacritty.yml ~/.alacritty.yml
-    ln -sf $CWD/nvim ~/.config/nvim
-    ln -sf $CWD/.zshrc ~/.zshrc
-    ln -sf $CWD/.p10k ~/.p10k
-    e_success "Created symlinks to configs"
 }
 
 get_setup() {
