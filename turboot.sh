@@ -130,7 +130,7 @@ add_custom_modules() {
 
 print_all_mods() {
     if [ ${#ADDITIONAL_MODS[@]} -eq 0 ]; then
-        e_arrow "No custom modules set"
+        e_arrow "No valid custom modules detected"
     else
         printf "${underline}${bold}${blue}Additional modules detected:${reset} \n"
         print_array "${ADDITIONAL_MODS[@]}"
@@ -163,6 +163,14 @@ get_setup() {
     e_arrow "what is the shorthand of your package manager? (eg: apt, dnf, pacman, yay, etc)"
     read pm
     PACKAGE_MANAGER=$pm
+}
+
+source_installation_file() {
+    source "$PACKAGE_MANAGER".sh 2>/dev/null
+    if [ $? -eq 1 ]; then
+        e_error "Cannot find installation files for $PACKAGE_MANAGER, generate one using \$(./turboot -g $PACKAGE_MANAGER)"
+        exit 1
+    fi
 }
 
 echo " _              _                 _
@@ -207,8 +215,7 @@ else
 fi
 
 # Source installation scripts
-# TODO: Create source for other package managers too
-source testPackageManager.sh
+source_installation_file
 
 # Installation for custom modules
 prompt_user "Do you want to add some custom modules?"

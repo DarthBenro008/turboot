@@ -1,3 +1,5 @@
+# This is an test package manager to test and debug turboot.
+
 install_zsh() {
     echo "zsh"
 }
@@ -27,9 +29,9 @@ install_nvim() {
 }
 
 install_vim_plug() {
-   echo "vim_plug"
+    echo "vim_plug"
 }
 
-install_python(){
+install_python() {
     echo "python"
 }
